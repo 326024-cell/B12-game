@@ -407,21 +407,27 @@
 
         // 入力イベントリスナーの設定
         function setupInputs() {
+            const updateDropPosition = (clientX) => {
+                const rect = container.getBoundingClientRect();
+                mouseX = (clientX - rect.left) * (GAME_WIDTH / rect.width);
+            };
+
             // マウス操作
             container.addEventListener('mousemove', (e) => {
-                const rect = container.getBoundingClientRect();
-                mouseX = (e.clientX - rect.left) * (GAME_WIDTH / rect.width);
+                updateDropPosition(e.clientX);
             });
 
             container.addEventListener('mousedown', dropFruit);
 
             // タッチ操作
-            container.addEventListener('touchmove', (e) => {
+            const handleTouchPosition = (e) => {
                 e.preventDefault(); // スクロール防止
-                const touch = e.touches[0];
-                const rect = container.getBoundingClientRect();
-                mouseX = (touch.clientX - rect.left) * (GAME_WIDTH / rect.width);
-            }, { passive: false });
+                if (e.touches.length > 0) {
+                    updateDropPosition(e.touches[0].clientX);
+                }
+            };
+            container.addEventListener('touchstart', handleTouchPosition, { passive: false });
+            container.addEventListener('touchmove', handleTouchPosition, { passive: false });
 
             container.addEventListener('touchend', (e) => {
                 e.preventDefault();
